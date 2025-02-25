@@ -23,6 +23,8 @@ import { Input } from "./ui/input";
 import FileUpload from "@/components/FileUpload";
 import Link from "next/link";
 import { FIELD_NAMES, FIELD_TYPES } from "@/constants";
+import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 
 
 
@@ -43,13 +45,31 @@ const AuthForm = <T extends FieldValues>({
 }: Props<T>) => {
 
     const isSignIn = type === "SIGN_IN";
+    const router = useRouter();
+
     const form: UseFormReturn<T> = useForm({
         resolver: zodResolver(schema),
         defaultValues: defaultValues as DefaultValues<T>,
     });
 
-    const handleSubmit: SubmitHandler<T> = async () => {
+    const handleSubmit: SubmitHandler<T> = async (data) => {
+        const result = await onSubmit(data);
 
+        if (result.success) {
+            toast(
+                isSignIn
+                    ? "You have successfully signed in."
+                    : "You have successfully signed up.",
+            );
+
+            router.push("/");
+        } else {
+            toast(
+                `Error ${isSignIn ? "signing in" : "signing up"}`,
+
+                //   variant: "destructive",
+            );
+        }
     }
 
 
@@ -81,12 +101,12 @@ const AuthForm = <T extends FieldValues>({
                                     <FormControl>
                                         {field.name === "universityCard" ? (
                                             <FileUpload
-                                            // type="image"
-                                            // accept="image/*"
-                                            // placeholder="Upload your ID"
-                                            // folder="ids"
-                                            // variant="dark"
-                                            // onFileChange={field.onChange}
+                                                // type="image"
+                                                // accept="image/*"
+                                                // placeholder="Upload your ID"
+                                                // folder="ids"
+                                                // variant="dark"
+                                                onFileChange={field.onChange}
                                             />
                                         ) : (
                                             <Input
