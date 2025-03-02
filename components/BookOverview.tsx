@@ -3,12 +3,13 @@ import Image from "next/image";
 import BookCover from "@/components/BookCover";
 import BorrowBook from "@/components/BorrowBook";
 import { db } from "@/database/drizzle";
-import { users } from "@/database/schema";
-import { eq } from "drizzle-orm";
+import { users, borrowRecords } from "@/database/schema";
+import { eq, and } from "drizzle-orm";
 
 interface Props extends Book {
   userId: string;
 }
+
 const BookOverview = async ({
   title,
   author,
@@ -28,13 +29,24 @@ const BookOverview = async ({
     .where(eq(users.id, userId))
     .limit(1);
 
+  // Check if the user has already borrowed this book
+  const borrowedBook = await db
+    .select()
+    .from(borrowRecords)
+    .where(and(eq(borrowRecords.userId, userId), eq(borrowRecords.bookId, id)))
+    .limit(1);
+
+  const hasBorrowed = borrowedBook.length > 0;
+
   const borrowingEligibility = {
-    isEligible: availableCopies > 0 && user?.status === "APPROVED",
-    message:
-      availableCopies <= 0
+    isEligible: !hasBorrowed && availableCopies > 0 && user?.status === "APPROVED",
+    message: hasBorrowed
+      ? "You have already borrowed this book"
+      : availableCopies <= 0
         ? "Book is not available"
         : "You are not eligible to borrow this book",
   };
+
   return (
     <section className="book-overview">
       <div className="flex flex-1 flex-col gap-5">
@@ -44,12 +56,9 @@ const BookOverview = async ({
           <p>
             By <span className="font-semibold text-light-200">{author}</span>
           </p>
-
           <p>
-            Category{" "}
-            <span className="font-semibold text-light-200">{genre}</span>
+            Category <span className="font-semibold text-light-200">{genre}</span>
           </p>
-
           <div className="flex flex-row gap-1">
             <Image src="/icons/star.svg" alt="star" width={22} height={22} />
             <p>{rating}</p>
@@ -60,7 +69,6 @@ const BookOverview = async ({
           <p>
             Total Books <span>{totalCopies}</span>
           </p>
-
           <p>
             Available Books <span>{availableCopies}</span>
           </p>
@@ -85,13 +93,8 @@ const BookOverview = async ({
             coverColor={coverColor}
             coverImage={coverUrl}
           />
-
           <div className="absolute left-16 top-10 rotate-12 opacity-40 max-sm:hidden">
-            <BookCover
-              variant="wide"
-              coverColor={coverColor}
-              coverImage={coverUrl}
-            />
+            <BookCover variant="wide" coverColor={coverColor} coverImage={coverUrl} />
           </div>
         </div>
       </div>

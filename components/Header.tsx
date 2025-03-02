@@ -4,10 +4,12 @@ import Link from 'next/link'
 import { Avatar, AvatarFallback, AvatarImage } from './ui/avatar'
 import { Session } from 'next-auth'
 import { getInitials } from '@/lib/utils'
+import { signOut } from '@/auth'
+import { Button } from './ui/button'
 
 const Header = ({ session }: { session: Session }) => {
   return (
-    <header className="my-10 flex 
+    <header className="my-5 flex 
      justify-between
      items-center
      gap-5">
@@ -25,16 +27,16 @@ const Header = ({ session }: { session: Session }) => {
         </li>
 
         <li>
-          {/* <form
+          <form
             action={async () => {
               "use server";
 
               await signOut();
             }}
-            className="mb-10"
+          // className="mb-10"
           >
             <Button>Logout</Button>
-          </form> */}
+          </form>
         </li>
       </ul>
     </header>

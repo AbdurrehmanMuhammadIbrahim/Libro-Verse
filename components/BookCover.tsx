@@ -46,8 +46,8 @@ const BookCover = ({
 
         <IKImage
           // src={coverImage}
-            path={coverImage}
-            urlEndpoint={config.env.imagekit.urlEndpoint}
+          path={coverImage}
+          urlEndpoint={config.env.imagekit.urlEndpoint}
           alt="Book cover"
           fill
           className="rounded-sm object-fill"

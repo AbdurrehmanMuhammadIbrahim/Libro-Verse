@@ -13,7 +13,7 @@ const Home = async () => {
   const result = await db.select().from(users);
   console.log(JSON.stringify(result, null, 2))
 
-  const session = auth()
+  const session = await auth()
 
   const latestBooks = (await db.select().from(books).limit(15).orderBy(desc(books.createdAt))) as Book[];
 
