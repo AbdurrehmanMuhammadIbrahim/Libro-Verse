@@ -1,0 +1,19 @@
+libroverse:
+
+neon (postgre SQL)
+drizzle
+imagekit
+Next Auth
+Upstash (Redis) for limitation
+color picker
+
+
+for databse:
+npm run db:studio   
+  when create/add new db:
+      npm run db:generate  
+      npm run db:migrate
+
+
+for frontend :
+npm run dev
